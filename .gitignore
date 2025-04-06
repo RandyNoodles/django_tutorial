@@ -1,3 +1,9 @@
+# Python virtual environment
+pyvenv.cfg
+virtualenv.cfg
+CACHEDIR.TAG
+
+
 # Django #
 *.log
 *.pot
