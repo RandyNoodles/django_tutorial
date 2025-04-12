@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from .models import Post
-from django.http import JsonResponse
+from .models import Post, Photo
+from django.http import JsonResponse, HttpResponse
 from .forms import PostForm
 from profiles.models import Profile
 
@@ -83,6 +83,33 @@ def like_unlike_post(request):
         return JsonResponse({'liked': liked, 'count': obj.like_count})
 
 
+def update_post(request, pk):
+    obj = Post.objects.get(pk=pk)
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        new_title = request.POST.get('title')
+        new_body = request.POST.get('body')
+        obj.title = new_title
+        obj.body = new_body
+        obj.save()
+        return JsonResponse({
+            'title': new_title,
+            'body': new_body,
+        })
 
-def hello_world_view(request):
-    return JsonResponse({'text': 'hello worldddd'})
+
+def delete_post(request, pk):
+    obj = Post.objects.get(pk=pk)
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        obj.delete()
+        return JsonResponse({})
+    
+
+def image_upload_view(request):
+    if request.method == 'POST':
+        img = request.FILES.get('file')
+        new_post_id = request.POST.get('new_post_id')
+        post = Post.objects.get(pk=new_post_id)
+        Photo.objects.create(image=img, post=post)
+        return HttpResponse()
+
+    
